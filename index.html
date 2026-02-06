@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion de Parking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>🚗 Gestion de Parking</h1>
+
+    <div class="init">
+        <label>Nombre total de places :</label><br>
+        <input type="number" id="totalPlaces">
+        <button onclick="initialiser()">Initialiser</button>
+    </div>
+    
+
+    <div class="actions">
+        <button onclick="entree()">Entrée véhicule</button>
+        <button onclick="sortie()">Sortie véhicule</button>
+    </div>
+
+    <div class="etat">
+        <h3>État du parking</h3>
+        <p id="etat"></p>
+    </div>
+
+    <div class="paiement">
+        <h3>Paiement</h3>
+        <p id="temps"></p>
+        <p id="montant"></p>
+        <button onclick="payer()">Payer</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

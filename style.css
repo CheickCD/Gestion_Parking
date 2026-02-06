@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #c2b0b0e1;
+}
+
+.container {
+    width: 420px;
+    margin: 60px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 6px;
+    width: 80%;
+    margin: 10px 0;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.init button {
+    background-color: #555;
+    color: white;
+}
+
+.actions button {
+    background-color: #007bff;
+    color: white;
+}
+
+.actions button:hover {
+    background-color: #0056b3;
+}
+
+.paiement {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #e9f5ff;
+    border-radius: 6px;
+}
+
+.paiement button {
+    background-color: green;
+    color: white;
+}
+
+.etat {
+    margin-top: 15px;
+    font-weight: bold;
+}
