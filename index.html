@@ -10,29 +10,51 @@
 <div class="container">
     <h1>🚗 Gestion de Parking</h1>
 
-    <div class="init">
-        <label>Nombre total de places :</label><br>
-        <input type="number" id="totalPlaces">
-        <button onclick="initialiser()">Initialiser</button>
-    </div>
-    
+    <p class="tarif">💰 Tarification : <strong>100 FCFA / heure</strong></p>
 
-    <div class="actions">
-        <button onclick="entree()">Entrée véhicule</button>
-        <button onclick="sortie()">Sortie véhicule</button>
-    </div>
+    <label>Nombre total de places :</label>
+    <input type="number" id="totalPlaces" placeholder="Ex : 10">
+    <button onclick="initialiser()">Initialiser</button>
 
-    <div class="etat">
-        <h3>État du parking</h3>
-        <p id="etat"></p>
-    </div>
+    <hr>
 
-    <div class="paiement">
-        <h3>Paiement</h3>
-        <p id="temps"></p>
-        <p id="montant"></p>
-        <button onclick="payer()">Payer</button>
-    </div>
+    <h3>Entrée du véhicule</h3>
+    <input type="text" id="immatEntree" placeholder="Immatriculation">
+    <button onclick="entree()">Entrer</button>
+
+    <h3>Sortie du véhicule</h3>
+    <input type="text" id="immatSortie" placeholder="Immatriculation">
+    <button onclick="sortie()">Sortir</button>
+
+    <p id="etat"></p>
+
+    <h3>🚘 Véhicules présents</h3>
+    <table>
+        <tr>
+            <th>Immatriculation</th>
+            <th>Heure d’entrée</th>
+        </tr>
+        <tbody id="listeEntrees"></tbody>
+    </table>
+
+    <h3>🚪 Véhicules sortis</h3>
+    <table>
+        <tr>
+            <th>Immatriculation</th>
+            <th>Heure d’entrée</th>
+            <th>Heure de sortie</th>
+            <th>Montant</th>
+        </tr>
+        <tbody id="listeSorties"></tbody>
+    </table>
+
+    <h3>Paiement</h3>
+    <p id="montant"></p>
+    <button onclick="payer()">Payer</button>
+
+    <h3>🎫 Ticket</h3>
+    <pre id="ticket"></pre>
+    <button onclick="imprimerTicket()">Imprimer le ticket (2 copies)</button>
 </div>
 
 <script src="script.js"></script>

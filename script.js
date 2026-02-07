@@ -1,103 +1,175 @@
-// ===== VARIABLES =====
-let placesTotales = 0;
-let placesOccupees = 0;
+let totalPlaces = 0;
+let parkingInitialise = false;
 
-let heureEntree = null;
-let paiementEffectue = false;
+let vehicules = [];       // Véhicules actuellement dans le parking
+let vehiculesSortis = []; // Véhicules déjà sortis
 
-const tarifParHeure = 500; // FCFA
+let ticketAuto = 1;
+const TARIF_HORAIRE = 100; // 100 FCFA / heure
 
-// ===== INITIALISATION =====
+// Initialisation du parking
 function initialiser() {
-    placesTotales = parseInt(document.getElementById("totalPlaces").value);
-
-    if (isNaN(placesTotales) || placesTotales <= 0) {
-        alert("Nombre de places invalide !");
+    if (parkingInitialise) {
+        alert("Le parking est déjà initialisé");
         return;
     }
 
-    placesOccupees = 0;
-    heureEntree = null;
-    paiementEffectue = false;
+    totalPlaces = parseInt(document.getElementById("totalPlaces").value);
+    if (isNaN(totalPlaces) || totalPlaces <= 0) {
+        alert("Nombre total de places invalide");
+        return;
+    }
 
-    afficherEtat("Parking initialisé");
+    parkingInitialise = true;
+    document.getElementById("totalPlaces").disabled = true;
+    afficherEtat();
 }
 
-// ===== ENTREE =====
+// Entrée véhicule
 function entree() {
-    if (placesOccupees >= placesTotales) {
-        afficherEtat("🚫 Parking plein !");
+    if (!parkingInitialise) {
+        alert("Veuillez initialiser le parking");
         return;
     }
 
-    placesOccupees++;
-    heureEntree = new Date();
-    paiementEffectue = false;
+    if (vehicules.length >= totalPlaces) {
+        alert("Parking plein !");
+        return;
+    }
 
-    afficherEtat("🚗 Véhicule entré");
+    let immat = document.getElementById("immatEntree").value.trim();
+    if (immat === "") {
+        alert("Immatriculation obligatoire");
+        return;
+    }
+
+    if (vehicules.find(v => v.immat === immat)) {
+        alert("Ce véhicule est déjà dans le parking");
+        return;
+    }
+
+    vehicules.push({
+        immat: immat,
+        entree: new Date()
+    });
+
+    document.getElementById("immatEntree").value = "";
+    afficherEntrees();
+    afficherEtat();
 }
 
-// ===== SORTIE =====
+// Préparer paiement
 function sortie() {
-    if (placesOccupees <= 0) {
-        afficherEtat("🚫 Parking vide !");
+    let immat = document.getElementById("immatSortie").value.trim();
+    let index = vehicules.findIndex(v => v.immat === immat);
+
+    if (index === -1) {
+        alert("Véhicule non trouvé");
         return;
     }
 
-    if (!paiementEffectue) {
-        afficherEtat("💳 Paiement obligatoire avant la sortie !");
-        return;
-    }
+    let vehicule = vehicules[index];
+    let heureSortie = new Date();
 
-    placesOccupees--;
-    heureEntree = null;
-    paiementEffectue = false;
+    // Calcul durée et montant
+    let dureeMs = heureSortie - vehicule.entree;
+    let dureeHeures = Math.ceil(dureeMs / (1000 * 60 * 60));
+    let montant = dureeHeures * TARIF_HORAIRE;
 
-    afficherEtat("✅ Véhicule sorti");
+    // Afficher montant à payer et ticket
+    document.getElementById("montant").innerHTML =
+        `💰 Montant à payer : <strong>${montant} FCFA</strong>`;
+
+    document.getElementById("ticket").textContent = `
+======== TICKET DE PARKING ========
+Ticket N° : ${ticketAuto}
+Immatriculation : ${vehicule.immat}
+Date et heure d'entrée : ${vehicule.entree.toLocaleString()}
+Date et heure de sortie : ${heureSortie.toLocaleString()}
+Tarif : 100 FCFA / heure
+Montant à payer : ${montant} FCFA
+==================================
+`;
+
+    // Ajouter à sortis mais le véhicule reste présent jusqu'au clic sur "Payer"
+    vehiculesSortis.push({
+        immat: vehicule.immat,
+        entree: vehicule.entree,
+        sortie: heureSortie,
+        montant: montant,
+        ticket: ticketAuto
+    });
+
+    ticketAuto++;
 }
 
-// ===== CALCUL DU PAIEMENT =====
-function calculerPaiement() {
-    if (!heureEntree) return 0;
-
-    const maintenant = new Date();
-    const dureeMs = maintenant - heureEntree;
-    const heures = Math.ceil(dureeMs / (1000 * 60 * 60));
-
-    return heures * tarifParHeure;
-}
-
-// ===== PAYER =====
+// Paiement et sortie réelle
 function payer() {
-    if (!heureEntree) {
-        afficherEtat("Aucun véhicule à payer");
+    if (vehiculesSortis.length === 0) {
+        alert("Aucun paiement en attente");
         return;
     }
 
-    const montant = calculerPaiement();
-    paiementEffectue = true;
+    // On prend le dernier véhicule pour payer
+    let v = vehiculesSortis[vehiculesSortis.length - 1];
 
-    document.getElementById("montant").innerText =
-        "💰 Montant payé : " + montant + " FCFA";
+    // Retirer le véhicule de la liste des présents
+    let index = vehicules.findIndex(vehicle => vehicle.immat === v.immat);
+    if (index !== -1) {
+        vehicules.splice(index, 1);
+    }
 
-    afficherEtat("Paiement effectué avec succès");
+    afficherEntrees();
+    afficherSorties();
+    afficherEtat();
+
+    alert(`Paiement de ${v.montant} FCFA effectué. Véhicule sorti !`);
 }
 
-// ===== AFFICHAGE =====
-function afficherEtat(message) {
-    document.getElementById("etat").innerHTML =
-        message + "<br><br>" +
-        "Places totales : " + placesTotales + "<br>" +
-        "Places occupées : " + placesOccupees + "<br>" +
-        "Places libres : " + (placesTotales - placesOccupees);
+// Impression (2 copies)
+function imprimerTicket() {
+    window.print();
+}
 
-    if (heureEntree) {
-        document.getElementById("temps").innerText =
-            "⏱ Temps de stationnement en cours...";
-        document.getElementById("montant").innerText =
-            "💰 Montant à payer : " + calculerPaiement() + " FCFA";
-    } else {
-        document.getElementById("temps").innerText = "";
-        document.getElementById("montant").innerText = "";
-    }
+// Affichage des véhicules présents
+function afficherEntrees() {
+    let tbody = document.getElementById("listeEntrees");
+    tbody.innerHTML = "";
+
+    vehicules.forEach(v => {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${v.immat}</td>
+            <td>${v.entree.toLocaleTimeString()}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Affichage des véhicules sortis
+function afficherSorties() {
+    let tbody = document.getElementById("listeSorties");
+    tbody.innerHTML = "";
+
+    vehiculesSortis.forEach(v => {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${v.immat}</td>
+            <td>${v.entree.toLocaleTimeString()}</td>
+            <td>${v.sortie.toLocaleTimeString()}</td>
+            <td>${v.montant} FCFA</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// État du parking
+function afficherEtat() {
+    let occupees = vehicules.length;
+    let libres = totalPlaces - occupees;
+
+    document.getElementById("etat").innerHTML =
+        `🅿️ Places totales : ${totalPlaces} |
+         🚗 Occupées : ${occupees} |
+         ✅ Libres : ${libres}`;
 }
